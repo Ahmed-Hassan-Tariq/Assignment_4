@@ -1,46 +1,57 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 
-public class Reader implements Runnable{
+public class Reader implements Callable {
+    int fromFileNo;
+    int toFileNo;
+
+    public Reader(int fromFileNo, int toFileNo) {
+        this.fromFileNo = fromFileNo;
+        this.toFileNo = toFileNo;
+    }
+
     @Override
-    public void run() {
-        System.out.println("Starting Reader");
+    public Integer call() throws Exception {
         File directoryPath = new File("C:\\Users\\Nimko-PC\\Desktop\\dataset");
         File fileList[] = directoryPath.listFiles();
-
-//        for(File file : fileList) {
-//            System.out.println("File name: "+file.getName());
-//            System.out.println("File path: "+file.getAbsolutePath());
-//        }
-
-
-
-
-        File textFile = new File("C:\\Users\\Nimko-PC\\Desktop\\dataset\\10001.txt");
         int count = 0;
-        try {
-            Scanner scanner = new Scanner(textFile);
 
-            while(scanner.hasNextLine()){
+        //Search word and count
+        String searchWord = "ebook";
+        int searchCount = 0;
+        for (int i = fromFileNo;i<toFileNo;i++ ) {
+            File textFile = new File("C:\\Users\\Nimko-PC\\Desktop\\dataset\\10001.txt");
+
+
+            try {
+                Scanner scanner = new Scanner(fileList[i].getAbsoluteFile());
+//                System.out.println("FileName: "+fileList[i].getName());
+                while (scanner.hasNextLine()) {
                     String nextLine = scanner.nextLine();
-                    if(nextLine.split(" ").length >1) {
-                        System.out.println(nextLine);
-                        System.out.println(nextLine.split(" ").length);
+                    if (nextLine.split(" ").length > 1) {
+                        for(int j = 0; j<nextLine.split(" ").length;j++){
+                            if(nextLine.split(" ")[j].equalsIgnoreCase(searchWord)){
+                                searchCount+=1;
+                            }
+                        }
+
+
                         count += nextLine.split(" ").length;
                     }
+                }
+                scanner.close();
+//                System.out.println("Word Count: "+count);
+//                System.out.println("Specific Word Count: "+searchCount);
+//                System.out.println("----------------------------------");
+
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
             }
 
-
-
-
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         }
-        System.out.println(count);
-
+        System.out.println("Thread Count: "+count);
+        return count;
     }
 }
