@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.Instant;
@@ -18,8 +19,13 @@ public class Receiver {
         //write to socket using ObjectOutputStream
         Instant start = Instant.now();
         while (socket.isConnected()) {
+            try {
                 objectInputStream = new ObjectInputStream(socket.getInputStream());
-
+            } catch (SocketException e){
+                objectInputStream.close();
+                socket.close();
+                break;
+            }
 
                 File receivedFile = (File) objectInputStream.readObject();
                 System.out.println("Server File: " + receivedFile.getName());
