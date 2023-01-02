@@ -13,7 +13,7 @@ public class Receiver {
         ObjectInputStream objectInputStream = null;
         //establish socket connection to server
         socket = new Socket("localhost", 1018);
-        socket.setKeepAlive(true);
+//        socket.setKeepAlive(true);
 
         //write to socket using ObjectOutputStream
         Instant start = Instant.now();

@@ -1,7 +1,6 @@
 import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -9,7 +8,7 @@ import java.util.concurrent.FutureTask;
 public class Main {
     public static void main(String[] args) throws Exception {
         Instant start = Instant.now();
-        File directoryPath = new File("C:\\Users\\Nimko-PC\\Desktop\\dataset");
+        File directoryPath = new File("C:\\Users\\Nimko-PC\\Desktop\\CS\\Semester_3\\Object-Oriented-Programming\\dataset");
         File fileList[] = directoryPath.listFiles();
         System.out.println("Files in Directory: "+fileList.length);
         Reader thread1 = new Reader(0,200);
@@ -46,8 +45,9 @@ public class Main {
                 executor.shutdown();
                 Instant end = Instant.now();
                 Duration totalTime = Duration.between(start, end);
-                int totalCount = ft1.get()+ft2.get()+ft3.get()+ft4.get()+ft5.get()+ft6.get()+ft7.get();
-                System.out.println("Total File Count: "+totalCount);
+                Aggregator.getLocations();
+                System.out.println("Total Word Count: "+Aggregator.totalCount);
+                System.out.println("Total Matched Words: "+ Aggregator.getSearchWord());
                 System.out.println("Total Time: " + totalTime.toSeconds() + "s");
             }
 

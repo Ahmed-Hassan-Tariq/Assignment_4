@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.Duration;
@@ -8,10 +9,8 @@ import java.util.concurrent.Callable;
 
 public class Sender implements Callable {
 
-    private static ServerSocket server;
-    private static Socket socket;
-    private static File file;
-
+    private ServerSocket server;
+    private Socket socket;
     private int fromFile;
     private int toFile;
 
@@ -22,6 +21,10 @@ public class Sender implements Callable {
     public Sender(int fromFile,int toFile) throws Exception {
         this.fromFile = fromFile;
         this.toFile = toFile;
+    }
+
+    @Override
+    public Object call() throws Exception {
         System.out.println("Sender Started");
         server = new ServerSocket(1018);
         System.out.println("Waiting for Client to Connect");
@@ -30,35 +33,28 @@ public class Sender implements Callable {
         Instant start = Instant.now();
 
         //Files sender
-        File directoryPath = new File("C:\\Users\\Nimko-PC\\Desktop\\dataset");
+        File directoryPath = new File("C:\\Users\\Nimko-PC\\Desktop\\CS\\Semester_3\\Object-Oriented-Programming\\dataset");
         File fileList[] = directoryPath.listFiles();
         int count = 0;
         int searchCount = 0;
 
-        for(int i=fromFile; i<toFile;i++){
-            this.file = fileList[i];
-            call();
+        for(int i=fromFile; i<toFile;i++) {
+            int response = 0;
+            if (socket.isConnected()) {
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(fileList[i]);
+
+
+                ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+                response = (int) objectInputStream.readObject();
+                wordCount += response;
+                Aggregator.totalCount+=response;
+
+            }
         }
-//        socket.close();
-//        server.close();
         Instant end = Instant.now();
         Duration duration = Duration.between(start,end);
-        System.out.println("Thread Count: "+wordCount+", "+duration.toSeconds()+"s");
-    }
-
-    @Override
-    public Object call() throws Exception {
-        int response = 0;
-        if (socket.isConnected()) {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            objectOutputStream.writeObject(file);
-
-
-            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-            response = (int) objectInputStream.readObject();
-            wordCount += response;
-
-        }
+        System.out.println("Received Count: "+wordCount+", "+duration.toSeconds()+"s");
         return wordCount;
     }
 }
